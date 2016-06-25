@@ -1,0 +1,139 @@
+/*导航条*/
+*{
+	padding: 0;
+	margin: 0;
+}
+.clearfix:after{
+	content: ".";
+	display: block;
+	clear: both;
+	overflow: hidden;
+	height: 0;
+}
+.header{
+	position: relative;
+	width: 100%;
+	height: 50px;
+	background-color: #000000;
+	text-align: center;
+	z-index: 2;
+}
+.header .outer li{
+	display: inline-block;
+	list-style: none;
+}
+.outerList{
+	height: 50px;
+	line-height: 50px;
+
+}
+.outerList a{
+	display: block;
+	padding: 0 15px;
+	color: #fff;
+	text-decoration: none;
+}
+.outerList:hover a{
+	color: #EDECEC;
+
+}
+.outerList .link span{
+	display: block;
+	height: 0;
+	width: 100%;
+	position: relative;
+	top: -10px;
+	left: 0;
+	background-color: #fff;
+
+}
+.outerList:hover .link span{
+	height: 1px;
+}
+.outerList .inter{
+	position: absolute;
+	left: 0;
+	height: 0;
+	overflow: hidden;
+	top: 50px;
+	right: 0;
+	background-color:rgba(0,0,0,0.5);
+}
+.outerList .inter li{
+	margin-top: 30px;
+}
+.outerList .inter strong{
+	display:block;
+	height: 25px;
+	line-height: 25px;
+	text-align: center;
+}
+.right{
+	position: absolute;
+	top: 0;
+	right: 50px;
+	height: 50px;
+	line-height: 50px;
+}
+.right li{
+	display: inline;
+	float: right;
+	height: 50px;
+	line-height: 50px;
+	list-style: none;
+}
+.right li a{
+	text-decoration: none;
+	color: #fff;
+	padding: 0 10px;
+}
+/*导航条结束*/
+/*轮播开始*/
+.warp{
+	position: relative;
+	z-index: 1;
+	width: 100%;
+}
+.list{
+	position: relative;
+	width: 100%;
+}
+.list li{
+	position: absolute;
+	top:0;
+	left: 0;
+	width: 100%;
+	list-style: none;
+	opacity: 1;
+}
+.list li img{
+	width: 100%;
+}
+.pre,.next{
+	position: absolute;
+	top: 50%;
+	bottom: 0;
+	width: 64px;
+	height: 64px;
+	z-index: 10;
+	margin-top: -32px;
+	text-align: center;
+	line-height: 64px;
+	color: #fff;
+	font-weight: bold;
+	font-size: 30px;
+	cursor: pointer;
+	background-color: transparent;
+}
+.pre{
+	left: 20px;
+	right: auto;
+}
+.next{
+	right:20px;
+	left: auto;
+}
+.pre:hover,.next:hover{
+	background-color: rgba(0,0,0,0.7);
+}
+/*轮播结束
