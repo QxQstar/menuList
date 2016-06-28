@@ -1,14 +1,3 @@
-function addLoadEvent(func){
-	var oldLoad = window.onload;
-	if(typeof oldLoad != 'function'){
-		window.onload = func();
-	}else{
-		window.onload = function(){
-			oldLoad();
-			func();
-		}
-	}
-}
 var untilEvent = {
 	addEvent:function(element,type,hander){
 		if(element.addEventListener){
@@ -45,64 +34,51 @@ var untilEvent = {
 //动画会乱。
 var timeDec1,timeAdd1,timeAdd2,timeDec2;
 function getOuter(){
-	var outerList1 = document.getElementById('outerList1');
-	var outerList2 = document.getElementById('outerList2');
 	var outer = document.getElementById('outer');
 	untilEvent.addEvent(outer,'mouseover',callBackOver);
-	untilEvent.addEvent(outerList1,'mouseout',callBackOut1);
-	untilEvent.addEvent(outerList2,'mouseout',callBackOut2);
+	untilEvent.addEvent(outer,'mouseout',callBackOut);
 }
 //mouseout事件：当鼠标从一个元素移入另一个元素时在鼠标离开的那个元素
 //上触发，获得鼠标的元素可能在失去鼠标元素的外部也可能在失去鼠标元素的
 //内部.所以需要判断mouseout事件的相关元素是否为外部li（即id为outerList或id为outerList2）元素
 //的子孙元素，如果是子孙元素，则内部无序列表无须收起。
-function callBackOut1(event){
+function callBackOut(event){
 	var event = untilEvent.getEvent(event);
 	var relatedTarget = untilEvent.getRelated(event);
 	var outerList1 = document.getElementById('outerList1');
 	var inter1 = document.getElementById('inter1');
-	var flag = false;
+	var outerList2 = document.getElementById('outerList2');
+	var inter2 = document.getElementById('inter2');
+	var flag1 = false,flag2 = false;
 	if(relatedTarget !== null){
 		var parented = relatedTarget.parentNode;
 		do{
 			if(parented === outerList1 || relatedTarget === outerList1){
-				flag = true;
+				flag1 = true;
+				break;
+			}else if(parented === outerList2 || relatedTarget === outerList2){
+				flag2 = true;
 				break;
 			}else{
 				parented = parented.parentNode;
 			}
 		}while(parented !== null);
 	}
-	if(!flag){
-		changeHeightDec1(inter1);
+	if(!flag1){
+		var str1 = 'flag1';
+		changeHeightDec(inter1,timeAdd1,str1);
+	}
+	if(!flag2){
+		var str2 = 'flag2';
+		changeHeightDec(inter2,timeAdd2,str2);
 	}
 }
-function callBackOut2(event){
-	var event = untilEvent.getEvent(event);
-	var relatedTarget = untilEvent.getRelated(event);
-	var outerList2 = document.getElementById('outerList2');
-	var inter2 = document.getElementById('inter2');
-	var flag = false;
-	if(relatedTarget !== null){
-		var parented = relatedTarget.parentNode;
-		do{
-			if(parented === outerList2 || relatedTarget === outerList2){
-				flag = true;
-				break;
-			}else{
-				parented = parented.parentNode;
-			}
-		}while(parented !== null);
-	}
-	if(!flag){
-		changeHeightDec2(inter2);
-	}
-}
-function changeHeightDec1(element){
+function changeHeightDec(element,timer,flag){
 	var offHeight = 70;
-	clearTimeout(timeAdd1);
-	change1();
-	function change1(){
+	var inverTimer = 10;
+	clearTimeout(timer);
+	change();
+	function change(){
 		var height = parseInt(element.style.height);
 		if(height > 0){
 			if(height%offHeight){
@@ -111,34 +87,15 @@ function changeHeightDec1(element){
 				height = height-height%offHeight;
 			}
 			if(height >= offHeight){
-			element.style.height = height - 50 +'px';
+			element.style.height = height - offHeight +'px';
 			}else{
 				element.style.height = 0+'px';
 			}
-			timeDec1 = setTimeout(change1,10);
-		}
-	}
-}
-function changeHeightDec2(element){
-	var offHeight = 70;
-	//清除定时器，确保当快速移动鼠标时，动画的流畅性
-	//例如：当鼠标移入后，在内部ul的长度还没有变为最大值时，又移除鼠标
-	//清除定时器可以保证，鼠标移除后内部ul的长度立即减小。timeAdd2或的timeAdd1
-	//是控制内部ul长度增加的定时器
-	clearTimeout(timeAdd2);
-	change2();
-	function change2(){
-		var height = parseInt(element.style.height);
-		if(height > 0){
-			if(height%offHeight){
-				height = height-height%offHeight;
-			}
-			if(height >= offHeight){
-			element.style.height = height - 50 +'px';
+			if(flag === 'flag1'){
+			 timeDec1= setTimeout(change,inverTimer);
 			}else{
-				element.style.height = 0+'px';
+				timeDec2 = setTimeout(change,inverTimer);
 			}
-			timeDec2 = setTimeout(change2,10);
 		}
 	}
 }
@@ -147,43 +104,39 @@ function callBackOver(event){
 	var target = untilEvent.getTarget(event);
 	var inter1 = document.getElementById('inter1');
 	var inter2 = document.getElementById('inter2');
-	console.log(target.id);
 	if(target.id == 'outerList1' || target.id == "link1"){
-		changeHeight(inter1,target);
+		var str1 = "flag1";
+		changeHeight(inter1,timeDec1,str1);
 	}
 	if(target.id == 'outerList2' || target.id == 'link2'){
-		changeHeight(inter2,target);
+		var str2 = "flag2";
+		changeHeight(inter2,timeDec2,str2);
 	}
 }
-function changeHeight(element,tar){
-	var totalHeight = 200;
-	if(tar.id == 'outerList1' || tar.id == 'link1'){
-		//当鼠标移入时清除让内部ul长度减小的定时器，保证鼠标移入后
-		//内部ul长度立即增加
-		clearTimeout(timeDec1);
-		change1();
-	}
-	function change1(){
+function changeHeight(element,timer,flag){
+	var totalHeight = 160;
+	var inverHeight = 10;
+	var inverTimer = 10;
+	clearTimeout(timer);
+	//当鼠标移入时清除让内部ul长度减小的定时器，保证鼠标移入后
+	//内部ul长度立即增加
+	change();
+	function change(){
 		var height = parseInt(element.style.height);
 		if(!height) height = 0;
-		if(element.offsetHeight < 200){
-		element.style.height = height + 10 +'px';
-			timeAdd1 = setTimeout(change1,20);
+		if(height < totalHeight){
+			if(height + inverHeight > totalHeight){
+				element.style.height = totalHeight + "px";
+			}else{
+				element.style.height = height + inverHeight +'px';
 			}
+			if(flag === 'flag1'){
+				timeAdd1 = setTimeout(change,inverTimer);
+				}else{
+					timeAdd2 = setTimeout(change,inverTimer);
+				}
 		}
-	if(tar.id == 'outerList2' || tar.id == 'link2'){
-		clearTimeout(timeDec2);
-		change2();
 	}
-	function change2(){
-		var height = parseInt(element.style.height);
-		if(!height) height = 0;
-		if(element.offsetHeight < 200){
-		element.style.height = height + 10 +'px';
-			timeAdd2 = setTimeout(change2,20);
-			}
-		}
-	
 }
 // 轮播的函数开始
 //设置class为list的高度,因为图片的position为absolute所以.list元素的高度为零
@@ -210,9 +163,10 @@ function btnClick(){
 	untilEvent.addEvent(warp,'click',function(event){
 		var event = untilEvent.getEvent(event);
 		var target = untilEvent.getTarget(event);
+		console.log(target.id);
 		switch(target.id){
 			case 'pre': if(index == 1){
-					index =3;
+					index = 3;
 				}else{
 					--index;
 				}
@@ -231,6 +185,7 @@ function btnClick(){
 //减小图片透明度
 function decline(cur,inverTime,inverOpacity){
 	var opacityed = parseFloat(cur.style.opacity);
+	if (!opacityed) opacityed = 1;
 	if(opacityed > 0){
 		cur.style.opacity = opacityed-inverOpacity;
 		setTimeout(function(){
@@ -251,8 +206,14 @@ function anmitate(){
 	}
 	var go = function(){
 		var opacityed = parseFloat(imgs[index - 1].style.opacity);
+		if(!opacityed)opacityed = 0;
 		if(opacityed < 1){
-			imgs[index-1].style.opacity = opacityed + inverOpacity;
+			var newOpacity = opacityed + inverOpacity;
+			if ( newOpacity > 1) {
+				imgs[index-1].style.opacity = 1;
+			}else{
+				imgs[index-1].style.opacity = newOpacity;
+			}
 			setTimeout(go,inverTime);
 		}
 	};
@@ -291,10 +252,10 @@ function throttle(method,context){
 	method.Tid = setTimeout(method,70);
 }
 // 轮播的函数结束
-addLoadEvent(scrollEvent);
-addLoadEvent(setListHeight);
-addLoadEvent(setLiIndex);
-addLoadEvent(btnClick);
-addLoadEvent(play);
-addLoadEvent(getWarp);
-addLoadEvent(getOuter);
+untilEvent.addEvent(window,'load',scrollEvent);
+untilEvent.addEvent(window,'load',setListHeight);
+untilEvent.addEvent(window,'load',setLiIndex);
+untilEvent.addEvent(window,'load',btnClick);
+untilEvent.addEvent(window,'load',play);
+untilEvent.addEvent(window,'load',getWarp);
+untilEvent.addEvent(window,'load',getOuter);
